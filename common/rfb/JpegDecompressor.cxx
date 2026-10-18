@@ -31,10 +31,7 @@
 #include <rfb/PixelFormat.h>
 
 #include <stdio.h>
-extern "C" {
-#include <jpeglib.h>
-}
-#include <jerror.h>
+#include "jpeg.h"
 #include <setjmp.h>
 
 using namespace rfb;

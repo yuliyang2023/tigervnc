@@ -2,6 +2,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   message(FATAL_ERROR "cmake must be invoked with the top level directory")
 endif()
 
+configure_file(jpeg.h.in jpeg.h @ONLY)
+
 add_library(rfb STATIC
   AccessRights.cxx
   Blacklist.cxx
@@ -20,6 +22,7 @@ add_library(rfb STATIC
   encodings.cxx
   obfuscate.cxx)
 
+target_include_directories(rfb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(rfb PUBLIC ${CMAKE_SOURCE_DIR}/common)
 target_include_directories(rfb SYSTEM PUBLIC ${JPEG_INCLUDE_DIR})
 target_link_libraries(rfb core rdr)

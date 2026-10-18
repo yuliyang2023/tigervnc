@@ -31,9 +31,7 @@
 #include <rfb/ClientParams.h>
 
 #include <stdio.h>
-extern "C" {
-#include <jpeglib.h>
-}
+#include "jpeg.h"
 #include <setjmp.h>
 
 using namespace rfb;

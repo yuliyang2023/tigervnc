@@ -1,0 +1,11 @@
+// Use the headers belonging to the JPEG library selected by CMake.
+// Compiler-injected include paths can otherwise override SYSTEM directories.
+#ifndef __RFB_JPEG_H__
+#define __RFB_JPEG_H__
+
+extern "C" {
+#include "@JPEG_INCLUDE_DIR@/jpeglib.h"
+#include "@JPEG_INCLUDE_DIR@/jerror.h"
+}
+
+#endif
