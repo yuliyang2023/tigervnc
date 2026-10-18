@@ -65,7 +65,8 @@ jobs:
             -DENABLE_AUDIO=OFF \
             -DENABLE_GNUTLS=ON \
             -DENABLE_NETTLE=ON \
-            -DMACOS_BUNDLE_LIBRARIES=ON
+            -DMACOS_BUNDLE_LIBRARIES=ON \
+            -DMACOS_DYLIB_SEARCH_PATH="$PWD/macos-deps/lib"
           test -f build/tests/unit/CTestTestfile.cmake
       - name: Build
         run: cmake --build build --parallel 3
@@ -74,6 +75,7 @@ jobs:
       - name: Verify architecture
         run: lipo build/vncviewer/vncviewer -verify_arch ${{ matrix.arch }}
       - name: Package standalone app
+        timeout-minutes: 5
         run: |
           cmake --build build --target dmg
           mkdir mounted

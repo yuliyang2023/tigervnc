@@ -38,6 +38,7 @@ endif() # WIN32
 
 if(APPLE)
 
+set(MACOS_DYLIB_SEARCH_PATH "" CACHE PATH "Additional runtime library search path for macOS bundling")
 option(MACOS_BUNDLE_LIBRARIES "Bundle third-party dylibs in the macOS app" OFF)
 if(MACOS_BUNDLE_LIBRARIES)
   find_program(DYLIBBUNDLER_EXECUTABLE dylibbundler)

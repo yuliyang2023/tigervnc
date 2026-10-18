@@ -50,7 +50,11 @@ for lang in `cat "$SRCDIR/po/LINGUAS"`; do
 done
 
 if [ "@MACOS_BUNDLE_LIBRARIES@" = "ON" ]; then
-	"@DYLIBBUNDLER_EXECUTABLE@" -od -b \
+	set --
+	if [ -n "@MACOS_DYLIB_SEARCH_PATH@" ]; then
+		set -- -s "@MACOS_DYLIB_SEARCH_PATH@"
+	fi
+	"@DYLIBBUNDLER_EXECUTABLE@" "$@" -od -b \
 		-x "$APPROOT/Contents/MacOS/vncviewer" \
 		-d "$APPROOT/Contents/Frameworks" \
 		-p '@executable_path/../Frameworks/'
