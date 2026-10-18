@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew install cmake pkgconf gettext meson ninja nasm texinfo dylibbundler
-      - uses: actions/cache@v6
+      - uses: actions/cache/restore@v6
         id: dependencies
         with:
           path: macos-deps
@@ -37,6 +37,11 @@ jobs:
         run: |
           export PATH="$(brew --prefix gettext)/bin:$(brew --prefix texinfo)/bin:$PATH"
           python3 .github/scripts/build-macos-dependencies.py "$PWD/macos-deps" ${{ matrix.arch }}
+      - uses: actions/cache/save@v6
+        if: steps.dependencies.outputs.cache-hit != 'true'
+        with:
+          path: macos-deps
+          key: ${{ steps.dependencies.outputs.cache-primary-key }}
       - name: Configure
         run: |
           export PATH="$PWD/macos-deps/bin:$(brew --prefix gettext)/bin:$PATH"
@@ -47,6 +52,8 @@ jobs:
             -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
             -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 \
             -DCMAKE_PREFIX_PATH="$PWD/macos-deps" \
+            -DFLTK_BASE_LIBRARY="$PWD/macos-deps/lib/libfltk.dylib" \
+            -DFLTK_INCLUDE_DIR="$PWD/macos-deps/include" \
             -DCMAKE_IGNORE_PREFIX_PATH="$(brew --prefix)" \
             -DPKG_CONFIG_EXECUTABLE="$(command -v pkg-config)" \
             -DGETTEXT_MSGFMT_EXECUTABLE="$(brew --prefix gettext)/bin/msgfmt" \
@@ -82,7 +89,9 @@ jobs:
         if: always()
         with:
           name: test-results-macos-${{ matrix.arch }}
-          path: build/tests/unit/test-results.xml
+          path: |
+            build/tests/unit/test-results.xml
+            build/CMakeFiles/CMakeConfigureLog.yaml
 
   universal:
     name: Universal DMG
