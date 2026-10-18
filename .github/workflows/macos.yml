@@ -47,7 +47,7 @@ jobs:
       - name: Test
         run: ctest --test-dir build/tests/unit --output-on-failure --output-junit test-results.xml
       - name: Verify architecture
-        run: lipo -verify_arch ${{ matrix.arch }} build/vncviewer/vncviewer
+        run: lipo build/vncviewer/vncviewer -verify_arch ${{ matrix.arch }}
       - name: Package standalone app
         run: |
           cmake --build build --target dmg
