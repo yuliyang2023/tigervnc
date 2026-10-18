@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 
 
-source, app = map(Path, sys.argv[1:])
+source, app, source_libraries = map(Path, sys.argv[1:])
 with tempfile.TemporaryDirectory(prefix="tigervnc-jpeg-") as directory:
     copied = Path(directory) / "TigerVNC.app"
     shutil.copytree(app, copied, symlinks=True)
@@ -20,7 +20,10 @@ with tempfile.TemporaryDirectory(prefix="tigervnc-jpeg-") as directory:
         dependency = line.strip().split(" (", 1)[0]
         if dependency.startswith(("/System/Library/", "/usr/lib/")):
             continue
-        name = Path(dependency).resolve().name
+        original = Path(dependency)
+        if not original.is_file():
+            original = source_libraries / original.name
+        name = original.resolve().name
         if not (libraries / name).is_file():
             raise RuntimeError(f"Test dependency missing from app: {dependency}")
         subprocess.run(["install_name_tool", "-change", dependency,

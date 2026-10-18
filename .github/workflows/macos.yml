@@ -86,7 +86,7 @@ jobs:
           cmake --build build --target dmg
           mkdir mounted
           hdiutil attach build/release/TigerVNC-*.dmg -mountpoint "$PWD/mounted" -nobrowse -readonly
-          python3 .github/scripts/check-packaged-jpeg.py build/tests/unit/jpeg mounted/TigerVNC.app
+          python3 .github/scripts/check-packaged-jpeg.py build/tests/unit/jpeg mounted/TigerVNC.app macos-deps/lib
           tar -czf build/TigerVNC-${{ matrix.arch }}.tar.gz -C mounted TigerVNC.app LICENCE.TXT README.rst
           hdiutil detach "$PWD/mounted"
       - uses: actions/upload-artifact@v7
