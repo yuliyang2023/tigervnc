@@ -79,6 +79,10 @@ extern core::StringParameter display;
 extern core::EnumListParameter shortcutModifiers;
 
 extern core::BoolParameter fullscreenSystemKeys;
+extern core::StringParameter socksProxy;
+extern core::StringParameter socksUser;
+extern core::StringParameter socksPassword;
+
 extern core::BoolParameter alertOnFatalError;
 extern core::BoolParameter reconnectOnError;
 

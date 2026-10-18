@@ -38,6 +38,14 @@ endif() # WIN32
 
 if(APPLE)
 
+option(MACOS_BUNDLE_LIBRARIES "Bundle third-party dylibs in the macOS app" OFF)
+if(MACOS_BUNDLE_LIBRARIES)
+  find_program(DYLIBBUNDLER_EXECUTABLE dylibbundler)
+  if(NOT DYLIBBUNDLER_EXECUTABLE)
+    message(FATAL_ERROR "dylibbundler is required for MACOS_BUNDLE_LIBRARIES")
+  endif()
+endif()
+
 configure_file(makemacapp.in makemacapp)
 configure_file(Info.plist.in Info.plist)
 

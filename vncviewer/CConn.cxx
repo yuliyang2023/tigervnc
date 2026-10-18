@@ -52,6 +52,7 @@
 #include <rfb/screenTypes.h>
 
 #include <network/TcpSocket.h>
+#include <network/Socks5.h>
 #ifndef WIN32
 #include <network/UnixSocket.h>
 #endif
@@ -182,6 +183,8 @@ void CConn::connect(const char* vncServerName, network::Socket* socket)
     try {
 #ifndef WIN32
       if (strchr(vncServerName, '/') != nullptr) {
+        if (strlen(socksProxy) > 0)
+          throw std::invalid_argument(_("SOCKS5 cannot be used with Unix sockets"));
         sock = new network::UnixSocket(vncServerName);
         serverHost = sock->getPeerAddress();
         vlog.info(_("Connected to socket %s"), serverHost.c_str());
@@ -190,7 +193,11 @@ void CConn::connect(const char* vncServerName, network::Socket* socket)
       {
         network::getHostAndPort(vncServerName, &serverHost, &serverPort);
 
-        sock = new network::TcpSocket(serverHost.c_str(), serverPort);
+        if (strlen(socksProxy) > 0)
+          sock = network::connectSocks5(socksProxy, serverHost.c_str(),
+                                         serverPort, socksUser, socksPassword);
+        else
+          sock = new network::TcpSocket(serverHost.c_str(), serverPort);
         vlog.info(_("Connected to host %s port %d"),
                   serverHost.c_str(), serverPort);
       }

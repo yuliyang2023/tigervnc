@@ -1,0 +1,64 @@
+name: macOS Viewer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: macOS ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: macos-15-intel
+          - arch: arm64
+            runner: macos-15
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install dependencies
+        run: |
+          brew install cmake pkgconf fltk@1.3 pixman jpeg-turbo gettext gnutls nettle gmp googletest dylibbundler
+      - name: Configure
+        run: |
+          export PATH="$(brew --prefix gettext)/bin:$(brew --prefix fltk@1.3)/bin:$PATH"
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix fltk@1.3);$(brew --prefix gettext);$(brew --prefix jpeg-turbo)" \
+            -DBUILD_VIEWER=ON \
+            -DBUILD_JAVA=OFF \
+            -DENABLE_NLS=ON \
+            -DENABLE_H264=OFF \
+            -DENABLE_AUDIO=OFF \
+            -DENABLE_GNUTLS=ON \
+            -DENABLE_NETTLE=ON \
+            -DMACOS_BUNDLE_LIBRARIES=ON
+          test -f build/tests/unit/CTestTestfile.cmake
+      - name: Build
+        run: cmake --build build --parallel 3
+      - name: Test
+        run: ctest --test-dir build/tests/unit --output-on-failure --output-junit test-results.xml
+      - name: Verify architecture
+        run: lipo -verify_arch ${{ matrix.arch }} build/vncviewer/vncviewer
+      - name: Package standalone app
+        run: |
+          cmake --build build --target dmg
+          mv build/release/TigerVNC-*.dmg build/release/TigerVNC-SOCKS5-${{ matrix.arch }}.dmg
+      - uses: actions/upload-artifact@v7
+        with:
+          name: TigerVNC-macOS-${{ matrix.arch }}
+          path: build/release/TigerVNC-SOCKS5-${{ matrix.arch }}.dmg
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results-macos-${{ matrix.arch }}
+          path: build/tests/unit/test-results.xml

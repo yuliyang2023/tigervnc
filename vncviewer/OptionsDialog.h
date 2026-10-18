@@ -31,6 +31,7 @@ class Fl_Round_Button;
 class Fl_Toggle_Button;
 class Fl_Input;
 class Fl_Int_Input;
+class Fl_Password_Input;
 class Fl_Choice;
 class Fl_Monitor_Arrangement;
 
@@ -58,6 +59,7 @@ protected:
   void createInputPage(int tx, int ty, int tw, int th);
   void createShortcutsPage(int tx, int ty, int tw, int th);
   void createDisplayPage(int tx, int ty, int tw, int th);
+  void createProxyPage(int tx, int ty, int tw, int th);
   void createMiscPage(int tx, int ty, int tw, int th);
 
   static void handleAutoselect(Fl_Widget *widget, void *data);
@@ -162,6 +164,11 @@ protected:
   Fl_Round_Button *allMonitorsButton;
   Fl_Round_Button *selectedMonitorsButton;
   Fl_Monitor_Arrangement *monitorArrangement;
+
+  /* Proxy */
+  Fl_Input *proxyInput;
+  Fl_Input *proxyUserInput;
+  Fl_Password_Input *proxyPasswordInput;
 
   /* Misc. */
   Fl_Check_Button *sharedCheckbox;

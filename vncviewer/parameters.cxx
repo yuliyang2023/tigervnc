@@ -256,6 +256,13 @@ core::StringParameter
   via("via", _("SSH gateway to tunnel the connection via"), "");
 #endif
 
+core::StringParameter
+  socksProxy("SocksProxy", _("SOCKS5 proxy (host:port or [IPv6]:port)"), "");
+core::StringParameter
+  socksUser("SocksUser", _("SOCKS5 proxy username"), "");
+core::StringParameter
+  socksPassword("SocksPassword", _("SOCKS5 proxy password (not saved)"), "");
+
 static const char* IDENTIFIER_STRING = "TigerVNC Configuration file Version 1.0";
 
 /*
@@ -269,6 +276,9 @@ static core::VoidParameter* parameterArray[] = {
   &rfb::CSecurityTLS::X509CRL,
 #endif // HAVE_GNUTLS
   &rfb::SecurityClient::secTypes,
+  /* Proxy (passwords are never saved) */
+  &socksProxy,
+  &socksUser,
   /* Misc. */
   &reconnectOnError,
   &shared,

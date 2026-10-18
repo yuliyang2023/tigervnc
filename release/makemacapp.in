@@ -49,6 +49,14 @@ for lang in `cat "$SRCDIR/po/LINGUAS"`; do
 		"$APPROOT/Contents/Resources/locale/$lang/LC_MESSAGES/tigervnc.mo"
 done
 
+if [ "@MACOS_BUNDLE_LIBRARIES@" = "ON" ]; then
+	"@DYLIBBUNDLER_EXECUTABLE@" -od -b \
+		-x "$APPROOT/Contents/MacOS/vncviewer" \
+		-d "$APPROOT/Contents/Frameworks" \
+		-p '@executable_path/../Frameworks/'
+	codesign --force --deep --sign - "$APPROOT"
+fi
+
 install -m 644 $SRCDIR/LICENCE.TXT $TMPDIR/dmg/
 install -m 644 $SRCDIR/README.rst $TMPDIR/dmg/
 

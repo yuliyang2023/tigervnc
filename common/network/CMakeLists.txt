@@ -3,6 +3,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 add_library(network STATIC
+  Socks5.cxx
   Socket.cxx
   TcpSocket.cxx)
 

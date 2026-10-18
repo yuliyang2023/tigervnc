@@ -64,6 +64,7 @@
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Int_Input.H>
+#include "fltk/Fl_Password_Input.h"
 #include <FL/Fl_Choice.H>
 
 std::map<OptionsCallback*, void*> OptionsDialog::callbacks;
@@ -97,6 +98,7 @@ OptionsDialog::OptionsDialog()
     createInputPage(tx, ty, tw, th);
     createShortcutsPage(tx, ty, tw, th);
     createDisplayPage(tx, ty, tw, th);
+    createProxyPage(tx, ty, tw, th);
     createMiscPage(tx, ty, tw, th);
   }
 
@@ -358,6 +360,9 @@ void OptionsDialog::loadOptions(void)
   handleFullScreenMode(selectedMonitorsButton, this);
 
   /* Misc. */
+  proxyInput->value(socksProxy);
+  proxyUserInput->value(socksUser);
+  proxyPasswordInput->value(socksPassword);
   sharedCheckbox->value(shared);
   reconnectCheckbox->value(reconnectOnError);
 #ifdef HAVE_AUDIO
@@ -516,6 +521,9 @@ void OptionsDialog::storeOptions(void)
   fullScreenSelectedMonitors.setMonitors(monitorArrangement->value());
 
   /* Misc. */
+  socksProxy.setParam(proxyInput->value());
+  socksUser.setParam(proxyUserInput->value());
+  socksPassword.setParam(proxyPasswordInput->value());
   shared.setParam(sharedCheckbox->value());
   reconnectOnError.setParam(reconnectCheckbox->value());
 #ifdef HAVE_AUDIO
@@ -1234,6 +1242,29 @@ void OptionsDialog::createDisplayPage(int tx, int ty, int tw, int th)
   ty += INNER_MARGIN;
   width = tw - OUTER_MARGIN * 2;
 
+  group->end();
+}
+
+
+void OptionsDialog::createProxyPage(int tx, int ty, int tw, int th)
+{
+  Fl_Group *group = new Fl_Group(tx, ty, tw, th, _("Proxy"));
+  tx += OUTER_MARGIN;
+  ty += OUTER_MARGIN + 20;
+  int width = tw - 2 * OUTER_MARGIN;
+
+  proxyInput = new Fl_Input(tx, ty, width, INPUT_HEIGHT,
+                            _("SOCKS5 proxy (host:port):"));
+  proxyInput->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+  proxyInput->tooltip(_("Leave empty for a direct connection"));
+  ty += INPUT_HEIGHT + INNER_MARGIN + 20;
+  proxyUserInput = new Fl_Input(tx, ty, width, INPUT_HEIGHT,
+                                _("Proxy username (optional):"));
+  proxyUserInput->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+  ty += INPUT_HEIGHT + INNER_MARGIN + 20;
+  proxyPasswordInput = new Fl_Password_Input(tx, ty, width, INPUT_HEIGHT,
+                                            _("Proxy password (not saved):"));
+  proxyPasswordInput->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
   group->end();
 }
 

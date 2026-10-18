@@ -236,6 +236,19 @@ GnuTLS priority string that controls the TLS session’s handshake algorithms.
 See the GnuTLS manual for possible values. Default is \fBNORMAL\fP.
 .
 .TP
+.B \-SocksProxy \fIhost:port\fP
+Connect through a SOCKS5 proxy. For IPv6 proxies use [address]:port.
+The port is literal, not a VNC display number. Destination hostnames are
+resolved by the proxy. Cannot be combined with \-listen, \-via or Unix sockets.
+The default is an empty value (direct connection).
+.TP
+.B \-SocksUser \fIusername\fP
+Username for SOCKS5 authentication. Leave empty for no authentication.
+.TP
+.B \-SocksPassword \fIpassword\fP
+Password for SOCKS5 authentication. Both username and password must be set
+for authenticated proxies. The password is not saved in configuration files.
+.TP
 .B \-listen \fI[port]\fP
 Causes vncviewer to listen on the given port (default 5500) for reverse
 connections from a VNC server.  WinVNC supports reverse connections initiated

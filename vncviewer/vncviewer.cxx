@@ -686,6 +686,11 @@ int main(int argc, char** argv)
   }
 #endif
 
+  if (listenMode && strlen(socksProxy) > 0) {
+    abort_vncviewer(_("Parameters -listen and -SocksProxy are incompatible"));
+    return 1;
+  }
+
   if (listenMode) {
     std::list<network::SocketListener*> listeners;
     try {
@@ -743,6 +748,10 @@ int main(int argc, char** argv)
 
 #ifndef WIN32
     if (strlen(via) > 0) {
+      if (strlen(socksProxy) > 0) {
+        abort_vncviewer(_("Parameters -via and -SocksProxy are incompatible"));
+        return 1;
+      }
       try {
         mktunnel();
       } catch (std::exception& e) {
