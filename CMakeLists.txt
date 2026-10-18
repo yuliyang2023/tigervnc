@@ -18,6 +18,12 @@ include(CheckCSourceRuns)
 
 include(CMakeMacroLibtoolFile)
 
+# Set the deployment target before compiler checks initialize the macOS SDK.
+if(CMAKE_HOST_APPLE)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING
+      "Minimum supported macOS version")
+endif()
+
 project(tigervnc)
 set(VERSION 1.16.80)
 

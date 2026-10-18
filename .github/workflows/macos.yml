@@ -18,21 +18,39 @@ jobs:
           - arch: arm64
             runner: macos-15
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 40
+    timeout-minutes: 90
     env:
       HOMEBREW_NO_AUTO_UPDATE: 1
+      MACOSX_DEPLOYMENT_TARGET: "13.0"
     steps:
       - uses: actions/checkout@v6
       - name: Install dependencies
         run: |
-          brew install cmake pkgconf fltk@1.3 pixman jpeg-turbo gettext gnutls nettle gmp googletest dylibbundler
+          brew install cmake pkgconf gettext meson ninja nasm texinfo dylibbundler
+      - uses: actions/cache@v6
+        id: dependencies
+        with:
+          path: macos-deps
+          key: macos13-${{ matrix.arch }}-${{ hashFiles('.github/scripts/macos-dependencies.json', '.github/scripts/build-macos-dependencies.py') }}
+      - name: Build runtime dependencies for macOS 13
+        if: steps.dependencies.outputs.cache-hit != 'true'
+        run: |
+          export PATH="$(brew --prefix gettext)/bin:$(brew --prefix texinfo)/bin:$PATH"
+          python3 .github/scripts/build-macos-dependencies.py "$PWD/macos-deps" ${{ matrix.arch }}
       - name: Configure
         run: |
-          export PATH="$(brew --prefix gettext)/bin:$(brew --prefix fltk@1.3)/bin:$PATH"
+          export PATH="$PWD/macos-deps/bin:$(brew --prefix gettext)/bin:$PATH"
+          export PKG_CONFIG_LIBDIR="$PWD/macos-deps/lib/pkgconfig"
+          export PKG_CONFIG_PATH="$PKG_CONFIG_LIBDIR"
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix fltk@1.3);$(brew --prefix gettext);$(brew --prefix jpeg-turbo)" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 \
+            -DCMAKE_PREFIX_PATH="$PWD/macos-deps" \
+            -DCMAKE_IGNORE_PREFIX_PATH="$(brew --prefix)" \
+            -DPKG_CONFIG_EXECUTABLE="$(command -v pkg-config)" \
+            -DGETTEXT_MSGFMT_EXECUTABLE="$(brew --prefix gettext)/bin/msgfmt" \
+            -DGETTEXT_MSGMERGE_EXECUTABLE="$(brew --prefix gettext)/bin/msgmerge" \
             -DBUILD_VIEWER=ON \
             -DBUILD_JAVA=OFF \
             -DENABLE_NLS=ON \
